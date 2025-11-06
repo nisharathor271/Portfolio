@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { User, Award, Target, Heart, BookOpen, Users, Trophy, GraduationCap } from 'lucide-react';
+import useIntersectionObserver from '../hooks/useIntersectionObserver';
 
 const About = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef(null);
+  const [sectionRef, isIntersecting, hasIntersected] = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '50px'
+  });
 
   const highlights = [
     {
@@ -30,21 +34,13 @@ const About = () => {
   ];
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    if (hasIntersected) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-
-    return () => observer.disconnect();
-  }, []);
+  }, [hasIntersected]);
 
   return (
     <section id="about" className="py-12 bg-gradient-to-br from-white via-slate-50 to-blue-50 relative overflow-hidden">
